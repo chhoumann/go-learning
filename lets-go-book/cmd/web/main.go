@@ -10,6 +10,7 @@ import (
 
 	"github.com/chhoumann/snippetbox/internal/models"
 
+	"github.com/go-playground/form/v4"
 	// Imported with an underscore to avoid the "imported and not used" error
 	// We need to import the driver package to register the driver with the database/sql package
 	// The driver package will be used implicitly by the sql.Open() function
@@ -20,6 +21,7 @@ type application struct {
 	logger   *slog.Logger
 	snippets *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder *form.Decoder
 }
 
 func main() {
@@ -42,10 +44,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
 		logger:   logger,
 		snippets: &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder: formDecoder,
 	}
 
 	logger.Info("starting server", slog.Any("addr", *addr))
