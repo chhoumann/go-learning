@@ -1,3 +1,7 @@
+github.com/alexedwards/scs/mysqlstore v0.0.0-20240203174419-a38e822451b6 h1:npjiNTwvsVAwF+ukm1At6RbzCzFAsOInhgZWzaKulkk=
+github.com/alexedwards/scs/mysqlstore v0.0.0-20240203174419-a38e822451b6/go.mod h1:p8jK3D80sw1PFrCSdlcJF1O75bp55HqbgDyyCLM0FrE=
+github.com/alexedwards/scs/v2 v2.7.0 h1:DY4rqLCM7UIR9iwxFS0++z1NhTzQlKV30aMHkJCDWKw=
+github.com/alexedwards/scs/v2 v2.7.0/go.mod h1:ToaROZxyKukJKT/xLcVQAChi5k6+Pn1Gvmdl7h3RRj8=
 github.com/go-playground/assert/v2 v2.0.1/go.mod h1:VDjEfimB/XKnb+ZQfWdccd7VUvScMdVu0Titje2rxJ4=
 github.com/go-playground/form/v4 v4.2.1 h1:HjdRDKO0fftVMU5epjPW2SOREcZ6/wLUzEobqUGJuPw=
 github.com/go-playground/form/v4 v4.2.1/go.mod h1:q1a2BY+AQUUzhl6xA/6hBetay6dEIhMHjgvJiGo6K7U=
