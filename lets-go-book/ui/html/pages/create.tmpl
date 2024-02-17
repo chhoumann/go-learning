@@ -1,50 +1,34 @@
-{{define "title"}}Create a New Snippet{{ end }} {{define "main"}}
-<form action="/snippet/create" method="POST">
+{{define "title"}}Create a New Snippet{{end}}
+
+{{define "main"}}
+<form action='/snippet/create' method='POST'>
+    <!-- Include the CSRF token -->
+    <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
     <div>
         <label>Title:</label>
-        <!-- Use the `with` action to render the value of .Form.FieldErrors.title if it is not empty. -->
-        {{ with .Form.FieldErrors.title }} <label class="error">{{.}}</label>
-        {{ end }}
-        <!-- Re-populate the title data by setting the `value` attribute. -->
-        <input type="text" name="title" value="{{.Form.Title}}" />
+        {{with .Form.FieldErrors.title}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type='text' name='title' value='{{.Form.Title}}'>
     </div>
     <div>
         <label>Content:</label>
-        <!-- Likewise render the value of .Form.FieldErrors.content if it is not empty. -->
-        {{ with .Form.FieldErrors.content }} <label class="error">{{.}}</label>
-        {{ end }}
-        <!-- Re-populate the content data as the inner HTML of the textarea. -->
-        <textarea name="content">{{.Form.Content}}</textarea>
+        {{with .Form.FieldErrors.content}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <textarea name='content'>{{.Form.Content}}</textarea>
     </div>
     <div>
         <label>Delete in:</label>
-        <!-- And render the value of .Form.FieldErrors.expires if it is not empty. -->
-        {{ with .Form.FieldErrors.expires }} <label class="error">{{.}}</label>
-        {{ end }}
-        <!-- Here we use the `if` action to check if the value of the re-populated expires field equals 365. If it does, then we render the `checked` attribute so that the radio input is re-selected. -->
-        <input
-            type="radio"
-            name="expires"
-            value="365"
-            {{if (eq .Form.Expires 365)}}checked{{end}}
-        />
-        One Year
-        <!-- And we do the same for the other possible values too... -->
-        <input
-            type="radio"
-            name="expires"
-            value="7"
-            {{if (eq .Form.Expires 7)}}checked{{end}}
-        />
-        One Week
-        <input
-            type="radio"
-            name="expires"
-            value="1"
-            {{if (eq .Form.Expires 1)}}checked{{end}}
-        />
-        One Day
+        {{with .Form.FieldErrors.expires}}
+            <label class='error'>{{.}}</label>
+        {{end}}
+        <input type='radio' name='expires' value='365' {{if (eq .Form.Expires 365)}}checked{{end}}> One Year
+        <input type='radio' name='expires' value='7' {{if (eq .Form.Expires 7)}}checked{{end}}> One Week
+        <input type='radio' name='expires' value='1' {{if (eq .Form.Expires 1)}}checked{{end}}> One Day
     </div>
-    <div><input type="submit" value="Publish snippet" /></div>
+    <div>
+        <input type='submit' value='Publish snippet'>
+    </div>
 </form>
-{{ end }}
+{{end}}
