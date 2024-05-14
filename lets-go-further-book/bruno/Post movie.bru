@@ -6,6 +6,18 @@ meta {
 
 post {
   url: http://localhost:4000/v1/movies
-  body: none
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "title": "Moana",
+    "year": 2016,
+    "runtime": "107 mins",
+    "genres": [
+      "animation",
+      "adventure"
+    ]
+  }
 }
