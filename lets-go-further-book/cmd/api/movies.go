@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"greenlight.bagerbach.com/internal/data"
 	"greenlight.bagerbach.com/internal/validator"
@@ -90,6 +91,16 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// If the client provided an "X-Expected-Version" header, check that the version
+	// matches the version of the record being updated. If not, return a 409 Conflict
+	// status code.
+	if r.Header.Get("X-Expected-Version") != "" {
+		if strconv.Itoa(int(movie.Version)) != r.Header.Get("X-Expected-Version") {
+			app.editConflictResponse(w, r)
+			return
+		}
+	}
+
 	// Pointers' zero-value is nil, so turning these into pointers lets us do partial updates
 	// (whereas e.g. the string zero-value is "" - you wouldn't know if it was or wasn't supplied!)
 	var input struct {
@@ -126,7 +137,12 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 
 	err = app.models.Movies.Update(movie)
 	if err != nil {
-		app.serverErrorResponse(w, r, err)
+		switch {
+		case errors.Is(err, data.ErrEditConflict):
+			app.editConflictResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
 		return
 	}
 
