@@ -35,12 +35,25 @@ func (app *application) serve() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		shutdownError <- srv.Shutdown(ctx)
+		err := srv.Shutdown(ctx)
+		if err != nil {
+			shutdownError <- err
+		}
+
+		app.logger.Info("completing background tasks", "addr", srv.Addr)
+
+		app.wg.Wait()        // block until all background goroutines are done (WaitGroup counter = 0)
+		shutdownError <- nil // send nil to shutdownError channel to indicate shutdown complete without issues
 	}()
 
 	app.logger.Info("starting server", "addr", srv.Addr, "port", app.config.port)
 
 	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+
+	err := <-shutdownError
+	if err != nil {
 		return err
 	}
 
