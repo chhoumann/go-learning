@@ -1,0 +1,6 @@
+export DATABASE_URL=
+export SMTP_HOST="sandbox.smtp.mailtrap.io"
+export SMTP_PORT=587
+export SMTP_USERNAME=
+export SMTP_PASSWORD=
+export SMTP_SENDER="Christian Bager Bach Houmann <no-reply@greenlight.bagerbach.com>"
