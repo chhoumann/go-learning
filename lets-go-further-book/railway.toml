@@ -1,9 +1,8 @@
 [build]
 builder = "nixpacks"
-buildCommand = "go build -ldflags=\"-X 'main.version=$(git describe --tags --always --dirty)' -X 'main.buildTime=$(date -u +'%Y-%m-%dT%H:%M:%SZ')' -X 'main.gitCommit=${RAILWAY_GIT_COMMIT}'\" -o ./bin/api ./cmd/api"
+buildCommand = "go build -o ./bin/api ./cmd/api"
 
 [deploy]
-image = "ghcr.io/bagerbach/greenlight:${RAILWAY_GIT_COMMIT}"
 healthCheckPath = "/v1/healthcheck"
 healthCheckTimeout = 100
 startCommand = "./bin/api"
