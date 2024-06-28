@@ -15,13 +15,15 @@ import (
 
 	"greenlight.bagerbach.com/internal/data"
 	"greenlight.bagerbach.com/internal/mailer"
+	"greenlight.bagerbach.com/internal/vcs"
 
 	// Import the pq driver - it needs to register itself with the database/sql package
 	_ "github.com/lib/pq"
 )
 
-// Will be generated automatically later.
-const version = "1.0.0"
+var (
+	version = vcs.Version()
+)
 
 type config struct {
 	port int
@@ -81,7 +83,14 @@ func main() {
 		return nil
 	})
 
+	displayVersion := flag.Bool("version", false, "Display version and exit")
+
 	flag.Parse()
+
+	if *displayVersion {
+		fmt.Printf("Version: %s\n", version)
+		os.Exit(0)
+	}
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
