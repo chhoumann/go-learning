@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "go build -ldflags=\"-X 'github.com/bagerbach/greenlight/internal/vcs.version=$(git describe --tags --always --dirty)' -X 'github.com/bagerbach/greenlight/internal/vcs.buildTime=$(date -u +'%Y-%m-%dT%H:%M:%SZ')' -X 'github.com/bagerbach/greenlight/internal/vcs.gitCommit=${RAILWAY_GIT_COMMIT}'\" -o ./bin/api ./cmd/api"
+buildCommand = "go build -ldflags=\"-X 'main.version=$(git describe --tags --always --dirty)' -X 'main.buildTime=$(date -u +'%Y-%m-%dT%H:%M:%SZ')' -X 'main.gitCommit=${RAILWAY_GIT_COMMIT}'\" -o ./bin/api ./cmd/api"
 
 [deploy]
 image = "ghcr.io/bagerbach/greenlight:${RAILWAY_GIT_COMMIT}"

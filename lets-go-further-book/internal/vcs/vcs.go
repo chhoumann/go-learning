@@ -1,16 +1,40 @@
 package vcs
 
-import "fmt"
-
-var (
-    version   string
-    buildTime string
-    gitCommit string
+import (
+	"fmt"
+	"runtime/debug"
 )
 
 func Version() string {
-    if version == "" && buildTime == "" && gitCommit == "" {
-        return "unknown-no-vcs-info"
-    }
-    return fmt.Sprintf("version: %s, build time: %s, git commit: %s", version, buildTime, gitCommit)
+	var (
+		time     string
+		revision string
+		modified bool
+	)
+
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "unknown-build-info-not-available"
+	}
+
+	for _, s := range bi.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			revision = s.Value
+		case "vcs.modified":
+			modified = s.Value == "true"
+		case "vcs.time":
+			time = s.Value
+		}
+	}
+
+	if time == "" && revision == "" {
+		return "unknown-no-vcs-info"
+	}
+
+	if modified {
+		return fmt.Sprintf("%s-%s-dirty", time, revision)
+	}
+
+	return fmt.Sprintf("%s-%s", time, revision)
 }
