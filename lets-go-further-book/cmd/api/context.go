@@ -12,7 +12,8 @@ type contextKey string
 const userContextKey = contextKey("user")
 
 func (app *application) contextSetUser(r *http.Request, user *data.User) *http.Request {
-	return r.WithContext(context.WithValue(r.Context(), userContextKey, user))
+	ctx := context.WithValue(r.Context(), userContextKey, user)
+	return r.WithContext(ctx)
 }
 
 func (app *application) contextGetUser(r *http.Request) *data.User {
