@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -62,21 +63,20 @@ type application struct {
 func main() {
 	var cfg config
 
-	flag.IntVar(&cfg.port, "port", 4000, "Server port to listen on")
-	flag.StringVar(&cfg.env, "env", "development", "Application environment (development|staging|production)")
-	flag.StringVar(&cfg.db.dsn, "db-dsn", "", "PostgreSQL DSN")
-	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "Maximum number of open connections to the database")
-	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "Maximum number of idle connections to the database")
-	// DurationVar lets us pass in any value acceptable to time.ParseDuration(), e.g. 300ms, 5s, 2h45m.
-	flag.DurationVar(&cfg.db.maxIdleTime, "db-max-idle-time", 15*time.Minute, "Maximum idle time for a connection to the database")
-	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", 2, "Rate limit to apply to requests per second")
-	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Burst limit to apply to requests")
-	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiting")
-	flag.StringVar(&cfg.smtp.host, "smtp-host", "", "SMTP host")
-	flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "SMTP port")
-	flag.StringVar(&cfg.smtp.username, "smtp-username", "", "SMTP username")
-	flag.StringVar(&cfg.smtp.password, "smtp-password", "", "SMTP password")
-	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "", "SMTP sender")
+	flag.IntVar(&cfg.port, "port", getEnvAsInt("PORT", 4000), "Server port to listen on")
+	flag.StringVar(&cfg.env, "env", getEnvAsString("ENV", "development"), "Application environment (development|staging|production)")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", getEnvAsString("DATABASE_URL", ""), "PostgreSQL DSN")
+	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", getEnvAsInt("DB_MAX_OPEN_CONNS", 25), "Maximum number of open connections to the database")
+	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", getEnvAsInt("DB_MAX_IDLE_CONNS", 25), "Maximum number of idle connections to the database")
+	flag.DurationVar(&cfg.db.maxIdleTime, "db-max-idle-time", getEnvAsDuration("DB_MAX_IDLE_TIME", 15*time.Minute), "Maximum idle time for a connection to the database")
+	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", getEnvAsFloat64("LIMITER_RPS", 2), "Rate limit to apply to requests per second")
+	flag.IntVar(&cfg.limiter.burst, "limiter-burst", getEnvAsInt("LIMITER_BURST", 4), "Burst limit to apply to requests")
+	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", getEnvAsBool("LIMITER_ENABLED", true), "Enable rate limiting")
+	flag.StringVar(&cfg.smtp.host, "smtp-host", getEnvAsString("SMTP_HOST", ""), "SMTP host")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", getEnvAsInt("SMTP_PORT", 25), "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", getEnvAsString("SMTP_USERNAME", ""), "SMTP username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", getEnvAsString("SMTP_PASSWORD", ""), "SMTP password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", getEnvAsString("SMTP_SENDER", ""), "SMTP sender")
 
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space separated)", func(s string) error {
 		cfg.cors.trustedOrigins = strings.Fields(s)
@@ -147,4 +147,47 @@ func openDB(cfg config) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func getEnvAsString(key string, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
+}
+
+func getEnvAsInt(key string, fallback int) int {
+	if value, exists := os.LookupEnv(key); exists {
+		if intValue, err := strconv.Atoi(value); err == nil {
+			return intValue
+		}
+	}
+	return fallback
+}
+
+func getEnvAsFloat64(key string, fallback float64) float64 {
+	if value, exists := os.LookupEnv(key); exists {
+		if floatValue, err := strconv.ParseFloat(value, 64); err == nil {
+			return floatValue
+		}
+	}
+	return fallback
+}
+
+func getEnvAsBool(key string, fallback bool) bool {
+	if value, exists := os.LookupEnv(key); exists {
+		if boolValue, err := strconv.ParseBool(value); err == nil {
+			return boolValue
+		}
+	}
+	return fallback
+}
+
+func getEnvAsDuration(key string, fallback time.Duration) time.Duration {
+	if value, exists := os.LookupEnv(key); exists {
+		if duration, err := time.ParseDuration(value); err == nil {
+			return duration
+		}
+	}
+	return fallback
 }

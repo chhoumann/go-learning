@@ -1,0 +1,9 @@
+[build]
+builder = "nixpacks"
+buildCommand = "go build -o ./bin/api ./cmd/api"
+
+[deploy]
+image = "ghcr.io/bagerbach/greenlight:${RAILWAY_GIT_SHA}"
+healthCheckPath = "/v1/healthcheck"
+healthCheckTimeout = 100
+startCommand = "./bin/api"
